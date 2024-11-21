@@ -108,12 +108,29 @@ public class Menu {
 
 
         dbOps.Update(dbName , collectionName , filter , update);
+        System.out.println("Number added!");
+
+        found = dbOps.Find(dbName , collectionName , filter);
+
+        scoreList = (List<Double>) found.get("Score");
+
+
+        for (int i = 0 ; i < scoreList.size() ; i++){
+            scoreList.set(i , scoreList.get(i)*20.0);
+        }
+
+        System.out.println(scoreList);
+
+        update = new Document("$set", new Document("Score" , scoreList));
+
+        dbOps.Update(dbName , collectionName , filter , update);
+
+
+        System.out.println("Numbers multiplied!");
+
 
     }
 
-    public static void MultiplyScoreArray(){
-
-    }
 
 
 }
