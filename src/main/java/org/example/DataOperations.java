@@ -73,7 +73,7 @@ public class DataOperations {
         document.append(refKey, refValue);
         collection.insertOne(document);
 
-        //System.out.println("Document that has refrence has been inserted in the collection "+collectionName);
+        //System.out.println("Document that has refrence has been inserted in "" + collectionName);
 
     }
 
