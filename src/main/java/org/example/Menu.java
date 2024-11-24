@@ -98,7 +98,7 @@ public class Menu {
 
 
 
-        if (found.getString("_id").equals("1")){
+        if (found.get("_id").equals("1")){
 
             update = new Document("$set", new Document("Score.2" , 5.0));
 
