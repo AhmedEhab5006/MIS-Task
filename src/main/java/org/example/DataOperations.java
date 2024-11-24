@@ -5,6 +5,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+import java.sql.SQLOutput;
+import java.util.Arrays;
+
 public class DataOperations {
 
     private final MongoClient mongoClient;
@@ -60,6 +63,20 @@ public class DataOperations {
             return null;
         }
     }
+
+    public void InsertWithRefrence(String dbName, String collectionName, Document document, String refKey, Object refValue){
+
+        MongoDatabase database = mongoClient.getDatabase(dbName);
+
+        MongoCollection<Document> collection = database.getCollection(collectionName);
+
+        document.append(refKey, refValue);
+        collection.insertOne(document);
+
+        //System.out.println("Document that has refrence has been inserted in the collection "+collectionName);
+
+    }
+
 
 
     }

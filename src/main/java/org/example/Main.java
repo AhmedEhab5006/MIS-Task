@@ -17,6 +17,9 @@ public class Main {
                case 4 :
                    Menu.UpdateMenu();
                    break;
+               case 5 :
+                   Menu.CreateRelationshipMenu();
+                   break;
                default:
                    System.out.println("Invalid input!");
            }
