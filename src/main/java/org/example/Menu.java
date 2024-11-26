@@ -86,61 +86,37 @@ public class Menu {
 
 
         List<Double> scoreList = Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-
         Document filter = new Document(filterKey, filterValue);
         Document found = dbOps.Find(dbName, collectionName, filter);
+        List<Document> doc = new ArrayList<>() ;
+
 
         try {
+            //making sure that document exists
             found.get("_id");
 
-            //Adding score array
+
+            //Initializing our score array to 0
             Document update = new Document("$set", new Document("Score", scoreList));
-            dbOps.Update(dbName, collectionName, filter, update);
+            doc.add(update);
+            dbOps.Update(dbName, collectionName, filter, doc);
             System.out.println("Score Array added!");
-
-            //Adding numbers to score array
-            if (found.get("_id").equals("1")){
-
-                update = new Document("$set", new Document("Score.2" , 5.0));
-
-            }
-            else {
-                update = new Document("$set", new Document("Score.4" , 6.0));
-            }
+            doc.remove(update);
 
 
-
-
-            /* DANGER ZONE
-            LinkedList<Object> condList = new LinkedList<Object>();
-            LinkedList<Object> eqArray = new LinkedList<Object>();
-            eqArray.add("$_id");
-            eqArray.add(1);
-            condList.add(new Document("$eq", eqArray));
-            condList.add("Score.2");
-            condList.add("Score.3");
-            Document conditionDoc = new Document("$cond", condList);
-            Document setDoc = new Document("$set", conditionDoc);
-            */
-
-
-
-            dbOps.Update(dbName, collectionName, filter, update);
+            //Adding numbers
+            doc.add(dbOps.AddNumbersToIndex().get(1));
+            dbOps.Update(dbName , collectionName , filter , doc);
             System.out.println("Number added!");
 
 
+            //resetting doc list
+            doc.clear();
+
 
             //multiplying numbers
-            found = dbOps.Find(dbName, collectionName, filter);
-            scoreList = (List<Double>) found.get("Score");
-
-            for (int i = 0; i < scoreList.size(); i++) {
-                scoreList.set(i, scoreList.get(i) * 20.0);
-            }
-
-            update = new Document("$set", new Document("Score" , scoreList));
-
-            dbOps.Update(dbName , collectionName , filter , update);
+            doc.add(dbOps.MultiplyBy20().get(1));
+            dbOps.Update(dbName , collectionName , filter , doc);
 
 
             System.out.println("Numbers multiplied!");

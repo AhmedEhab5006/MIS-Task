@@ -1,12 +1,8 @@
 package org.example;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
 import org.bson.Document;
-
-import java.sql.SQLOutput;
 import java.util.Arrays;
+import java.util.List;
 
 public class DataOperations {
 
@@ -14,11 +10,6 @@ public class DataOperations {
     public DataOperations(MongoClient mongoClient) {
         this.mongoClient = mongoClient;
     }
-
-    public MongoClient getMongoClient(){
-        return this.mongoClient;
-    }
-
 
 
 
@@ -29,14 +20,41 @@ public class DataOperations {
         System.out.println("Document inserted into collection: " + collectionName);
     }
 
-    public void CreateCollection(String dbName, String collectionName) {
-        MongoDatabase database = mongoClient.getDatabase(dbName);
-        database.createCollection(collectionName);
-        System.out.println("Collection created: " + collectionName);
+
+    public List<Document> AddNumbersToIndex () {
+        List<Document> doc = Arrays.asList(
+                new Document("$set", new Document("Score", new Document("$ifNull", Arrays.asList("$Score", Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))))),
+                new Document("$set", new Document("Score", Arrays.asList(
+                        new Document("$arrayElemAt", Arrays.asList("$Score", 0)),
+                        new Document("$arrayElemAt", Arrays.asList("$Score", 1)),
+                        new Document("$cond", Arrays.asList(
+                                new Document("$eq", Arrays.asList("$_id", "1")),
+                                5.0,
+                                new Document("$arrayElemAt", Arrays.asList("$Score", 2))
+                        )),
+                        new Document("$cond", Arrays.asList(
+                                new Document("$ne", Arrays.asList("$_id", "1")),
+                                6.0,
+                                new Document("$arrayElemAt", Arrays.asList("$Score", 3))
+                        )),
+                        new Document("$arrayElemAt", Arrays.asList("$Score", 4)),
+                        new Document("$arrayElemAt", Arrays.asList("$Score", 5))
+                ))));
+        return doc;
+    }
+
+    public List<Document> MultiplyBy20 (){
+       List<Document> doc = Arrays.asList(
+                new Document("$set", new Document("Score", new Document("$ifNull", Arrays.asList("$Score", Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0))))),
+                new Document("$set", new Document("Score", new Document("$map", new Document("input", "$Score")
+                        .append("as", "score")
+                        .append("in", new Document("$multiply", Arrays.asList("$$score", 20))))))
+        );
+       return doc;
     }
 
 
-    public void Update(String dbName, String collectionName, Document filter, Document update) {
+    public void Update(String dbName, String collectionName, Document filter, List<Document> update) {
         MongoDatabase database = mongoClient.getDatabase(dbName);
         MongoCollection<Document> collection = database.getCollection(collectionName);
         collection.updateMany(filter, update);
