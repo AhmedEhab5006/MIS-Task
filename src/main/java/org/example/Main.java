@@ -6,22 +6,17 @@ public class Main {
         while ((choice = Menu.MainMenu()) != -1){
            switch (choice) {
                case 1 :
-                   Menu.CreateCollectionMenu();
-                   break;
-               case 2 :
-                   Menu.InsertDocumentMenu();
-                   break;
-               case 3 :
                    Menu.DeleteMenu();
                    break;
-               case 4 :
+               case 2 :
                    Menu.UpdateMenu();
                    break;
-               case 5 :
+               case 3 :
                    Menu.CreateRelationshipMenu();
                    break;
                default:
                    System.out.println("Invalid input!");
+                   break;
            }
 
        }

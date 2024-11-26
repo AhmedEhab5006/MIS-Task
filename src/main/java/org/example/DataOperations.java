@@ -39,7 +39,7 @@ public class DataOperations {
     public void Update(String dbName, String collectionName, Document filter, Document update) {
         MongoDatabase database = mongoClient.getDatabase(dbName);
         MongoCollection<Document> collection = database.getCollection(collectionName);
-        collection.updateOne(filter, update);
+        collection.updateMany(filter, update);
         System.out.println("Document updated in collection: " + collectionName);
     }
 
@@ -47,7 +47,7 @@ public class DataOperations {
     public void Delete(String dbName, String collectionName, Document filter) {
         MongoDatabase database = mongoClient.getDatabase(dbName);
         MongoCollection<Document> collection = database.getCollection(collectionName);
-        collection.deleteOne(filter);
+        collection.deleteMany(filter);
         System.out.println("Document deleted from collection: " + collectionName);
     }
 

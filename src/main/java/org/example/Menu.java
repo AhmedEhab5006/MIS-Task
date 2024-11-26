@@ -1,7 +1,6 @@
 package org.example;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+
 import org.bson.Document;
 
 import javax.swing.text.DocumentFilter;
@@ -13,67 +12,68 @@ public class Menu {
     public static DataOperations dbOps = new DataOperations(connection.getMongoClient());
 
     public static Scanner input = new Scanner(System.in);
-    public static int MainMenu(){
+
+    public static int MainMenu() {
         System.out.println("---------------Welcome to our DB management system--------------------------------");
         System.out.println("Choose an operation to do :");
-        System.out.println("(1) to create a new collection");
-        System.out.println("(2) to insert a document to a collection");
-        System.out.println("(3) to delete a document from a collection");
-        System.out.println("(4) to update a document");
-        System.out.println("(5) to create a one to many relationship");
+        System.out.println("(1) to delete a document from a collection");
+        System.out.println("(2) to update a document");
+        System.out.println("(3) to create a one to many relationship");
         System.out.println("(-1) to exit");
-        int choice = input.nextInt();
-        return choice ;
-    }
 
-    public static void CreateCollectionMenu(){
-        System.out.println("Enter your collection name :");
-        String collectionName = input.next();
-        System.out.println("Enter your desired database name");
-        String dbName = input.next();
-        dbOps.CreateCollection(dbName , collectionName);
-    }
 
-    public static void InsertDocumentMenu(){
-        System.out.println("Enter your desired database name :");
-        String dbName = input.next();
-        System.out.println("Enter your desired collection name : ");
-        String collectionName = input.next();
-        Document doc = new Document();
-        int choice = 0 ;
-        while(choice != -1){
-
-            System.out.println("Enter your key name :");
-            String key = input.next();
-            System.out.println("Enter your value name :");
-            String value = input.next();
-
-            doc.append(key , value);
-
-            System.out.println("Do you want to add another field ? (Any number) for YES (-1) for NO");
-            choice = input.nextInt();
+        try {
+            int choice = input.nextInt();
+            return choice;
+        } catch (InputMismatchException e) {
+            System.out.println("Please enter an integer number");
+            return -1;
         }
 
-        dbOps.Insert(dbName , collectionName , doc);
     }
 
-    public static void DeleteMenu(){
 
-        System.out.println("Enter desired database :");
-        String dbName = input.next();
-        System.out.println("Enter desired collection name :");
-        String collectionName = input.next();
-        System.out.println("Enter DOC filter key :");
-        String filterKey = input.next();
-        System.out.println("Enter DOC filter value :");
-        String filterValue = input.next();
+    public static void DeleteMenu() {
 
-        Document filter = new Document(filterKey , filterValue);
-        dbOps.Delete(dbName , collectionName , (filter));
+        int cont = 0;
+        while (cont != -1) {
 
+            System.out.println("Enter desired database :");
+            String dbName = input.next();
+            System.out.println("Enter desired collection name :");
+            String collectionName = input.next();
+            System.out.println("Enter DOC filter key :");
+            String filterKey = input.next();
+            System.out.println("Enter DOC filter value :");
+            String filterValue = input.next();
+
+            Document filter = new Document(filterKey, filterValue);
+
+
+            Document found = dbOps.Find(dbName, collectionName, filter);
+
+
+            try {
+                found.get("_id");
+                dbOps.Delete(dbName, collectionName, (filter));
+            } catch (NullPointerException e) {
+                System.out.println("There are no matched documents");
+            }
+
+            System.out.println("Do you want to do another delete operation ?? (1) for YES (-1) for no");
+
+            try {
+                cont = input.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Please enter an integer number");
+                cont = -1;
+            }
+
+
+        }
     }
 
-    public static void UpdateMenu(){
+    public static void UpdateMenu() {
 
         System.out.println("Enter desired database :");
         String dbName = input.next();
@@ -85,55 +85,75 @@ public class Menu {
         String filterValue = input.next();
 
 
-        List<Double> scoreList = Arrays.asList(0.0 , 0.0 , 0.0 , 0.0 , 0.0 , 0.0);
+        List<Double> scoreList = Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
-        Document filter = new Document(filterKey , filterValue);
-        Document update = new Document("$set", new Document("Score" , scoreList));
+        Document filter = new Document(filterKey, filterValue);
+        Document found = dbOps.Find(dbName, collectionName, filter);
 
-        System.out.println("Score Array added!");
+        try {
+            found.get("_id");
 
-        dbOps.Update(dbName , collectionName , filter , update);
+            //Adding score array
+            Document update = new Document("$set", new Document("Score", scoreList));
+            dbOps.Update(dbName, collectionName, filter, update);
+            System.out.println("Score Array added!");
 
-        Document found = dbOps.Find(dbName , collectionName , filter);
+            //Adding numbers to score array
+            if (found.get("_id").equals("1")){
+
+                update = new Document("$set", new Document("Score.2" , 5.0));
+
+            }
+            else {
+                update = new Document("$set", new Document("Score.4" , 6.0));
+            }
 
 
 
-        if (found.get("_id").equals("1")){
 
-            update = new Document("$set", new Document("Score.2" , 5.0));
+            /* DANGER ZONE
+            LinkedList<Object> condList = new LinkedList<Object>();
+            LinkedList<Object> eqArray = new LinkedList<Object>();
+            eqArray.add("$_id");
+            eqArray.add(1);
+            condList.add(new Document("$eq", eqArray));
+            condList.add("Score.2");
+            condList.add("Score.3");
+            Document conditionDoc = new Document("$cond", condList);
+            Document setDoc = new Document("$set", conditionDoc);
+            */
 
+
+
+            dbOps.Update(dbName, collectionName, filter, update);
+            System.out.println("Number added!");
+
+
+
+            //multiplying numbers
+            found = dbOps.Find(dbName, collectionName, filter);
+            scoreList = (List<Double>) found.get("Score");
+
+            for (int i = 0; i < scoreList.size(); i++) {
+                scoreList.set(i, scoreList.get(i) * 20.0);
+            }
+
+            update = new Document("$set", new Document("Score" , scoreList));
+
+            dbOps.Update(dbName , collectionName , filter , update);
+
+
+            System.out.println("Numbers multiplied!");
+
+
+
+        } catch (NullPointerException e) {
+            System.out.println("There are no matched documents");
         }
-        else {
-            update = new Document("$set", new Document("Score.4" , 6.0));
-        }
-
-
-        dbOps.Update(dbName , collectionName , filter , update);
-        System.out.println("Number added!");
-
-        found = dbOps.Find(dbName , collectionName , filter);
-
-        scoreList = (List<Double>) found.get("Score");
-
-
-        for (int i = 0 ; i < scoreList.size() ; i++){
-            scoreList.set(i , scoreList.get(i)*20.0);
-        }
-
-        System.out.println(scoreList);
-
-        update = new Document("$set", new Document("Score" , scoreList));
-
-        dbOps.Update(dbName , collectionName , filter , update);
-
-
-        System.out.println("Numbers multiplied!");
-
-
     }
 
 
-    public static void CreateRelationshipMenu(){
+    public static void CreateRelationshipMenu() {
 
         System.out.println("Enter database name");
         String dbName = input.next();
@@ -147,7 +167,7 @@ public class Menu {
         System.out.println("---Inserting document in the first collection menu---");
         Document firstCollectionDocument = new Document();
         System.out.println("Enter the key and the value, Enter '-1' in the key to finish inserting key and value");
-        while(true) {
+        while (true) {
             System.out.print("key: ");
             String key = input.next();
             if (key.equals("-1")) {
@@ -156,15 +176,15 @@ public class Menu {
 
             System.out.print("value: ");
             String value = input.next();
-            firstCollectionDocument.append(key,value);
+            firstCollectionDocument.append(key, value);
         }
-        dbOps.Insert(dbName,firstCollection,firstCollectionDocument);
+        dbOps.Insert(dbName, firstCollection, firstCollectionDocument);
 
 
         System.out.println("---Inserting document in the second collection that has refrence to the first menu--- ");
         System.out.println("Enter the key and the value, Enter '-1' in the key to finish inserting key and value ");
         Document secondCollectionDocument = new Document();
-        while(true) {
+        while (true) {
             System.out.print("key: ");
             String key = input.next();
             if (key.equals("-1")) {
@@ -173,7 +193,7 @@ public class Menu {
 
             System.out.print("value: ");
             String value = input.next();
-            secondCollectionDocument.append(key,value);
+            secondCollectionDocument.append(key, value);
         }
 
         System.out.println("Enter the refrence key to use in the second collection ");
@@ -184,24 +204,18 @@ public class Menu {
         System.out.println("Enter the value for that key that identifies the document in the first collection");
         String firstFilterValue = input.next();
 
-        Document firstFilter = new Document(firstFilterKey,firstFilterValue);
-        Document firstDocument = dbOps.Find(dbName,firstCollection,firstFilter);
+        Document firstFilter = new Document(firstFilterKey, firstFilterValue);
+        Document firstDocument = dbOps.Find(dbName, firstCollection, firstFilter);
 
-        if(firstDocument != null){
-            dbOps.InsertWithRefrence(dbName,secondCollection,secondCollectionDocument,refkey,firstDocument.get("_id"));
+        if (firstDocument != null) {
+            dbOps.InsertWithRefrence(dbName, secondCollection, secondCollectionDocument, refkey, firstDocument.get("_id"));
             System.out.println("Document that has refrence to the first collection is inserted in the second collection  ");
-        }
-        else{
+        } else {
             System.out.println("An error occurred ");
         }
     }
-
-    public static void MultiplyScoreArray(){
-
-    }
-
-
-
 }
+
+
 
 
