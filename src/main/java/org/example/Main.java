@@ -1,18 +1,22 @@
 package org.example;
 
+import com.mongodb.client.MongoDatabase;
+
+import static org.example.Menu.connection;
+
 public class Main {
     public static void main(String[] args) {
         int choice;
         while ((choice = Menu.MainMenu()) != -1){
            switch (choice) {
                case 1 :
-                   Menu.DeleteMenu();
+                   Menu.createCollectionsAndDocuments();
                    break;
                case 2 :
-                   Menu.UpdateMenu();
+                   Menu.DeleteMenu();
                    break;
                case 3 :
-                   Menu.CreateRelationshipMenu();
+                   Menu.UpdateMenu();
                    break;
                default:
                    System.out.println("Invalid input!");

@@ -1,6 +1,8 @@
 package org.example;
+import java.sql.SQLOutput;
 import java.util.*;
 
+import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
 import javax.swing.text.DocumentFilter;
@@ -16,9 +18,9 @@ public class Menu {
     public static int MainMenu() {
         System.out.println("---------------Welcome to our DB management system--------------------------------");
         System.out.println("Choose an operation to do :");
-        System.out.println("(1) to delete a document from a collection");
-        System.out.println("(2) to update a document");
-        System.out.println("(3) to create a one to many relationship");
+        System.out.println("(1) to create customers and orders collections");
+        System.out.println("(2) to delete a document from a collection");
+        System.out.println("(3) to update a document");
         System.out.println("(-1) to exit");
 
 
@@ -32,6 +34,30 @@ public class Menu {
 
     }
 
+
+    public static void createCollectionsAndDocuments(){
+        String dbName = "techStoreDB";
+        String customersCollection = "customers";
+        String ordersCollection = "orders";
+
+        //dropping the collections so that the data dont get duplicated when we run again
+        dbOps.deleteCollection(dbName,customersCollection);
+        dbOps.deleteCollection(dbName,ordersCollection);
+
+        dbOps.CreateCustomersCollection(dbName,customersCollection);
+        dbOps.CreateOrdersCollection(dbName,ordersCollection);
+
+        dbOps.Insert(dbName, customersCollection,new Document("name","ali").append("age",20).append("city","cairo"));
+        dbOps.Insert(dbName, customersCollection,new Document("name","ahmed").append("age",19).append("city","giza"));
+        dbOps.Insert(dbName, customersCollection,new Document("name","omar").append("age",21).append("city","alexandria"));
+
+        dbOps.Insert(dbName,ordersCollection,new Document("item","laptop").append("price",65000).append("orderID",1));
+        dbOps.Insert(dbName,ordersCollection,new Document("item","mobile").append("price",40000).append("orderID",2));
+        dbOps.Insert(dbName,ordersCollection,new Document("item","headphone").append("price",1000).append("orderID",3));
+
+        System.out.println("Customers and Orders collections created successfully");
+
+    }
 
     public static void DeleteMenu() {
 
@@ -128,68 +154,6 @@ public class Menu {
         }
     }
 
-
-    public static void CreateRelationshipMenu() {
-
-        System.out.println("Enter database name");
-        String dbName = input.next();
-
-        System.out.println("Enter the first collection's name");
-        String firstCollection = input.next();
-
-        System.out.println("Enter the second collection's name");
-        String secondCollection = input.next();
-
-        System.out.println("---Inserting document in the first collection menu---");
-        Document firstCollectionDocument = new Document();
-        System.out.println("Enter the key and the value, Enter '-1' in the key to finish inserting key and value");
-        while (true) {
-            System.out.print("key: ");
-            String key = input.next();
-            if (key.equals("-1")) {
-                break;
-            }
-
-            System.out.print("value: ");
-            String value = input.next();
-            firstCollectionDocument.append(key, value);
-        }
-        dbOps.Insert(dbName, firstCollection, firstCollectionDocument);
-
-
-        System.out.println("---Inserting document in the second collection that has refrence to the first menu--- ");
-        System.out.println("Enter the key and the value, Enter '-1' in the key to finish inserting key and value ");
-        Document secondCollectionDocument = new Document();
-        while (true) {
-            System.out.print("key: ");
-            String key = input.next();
-            if (key.equals("-1")) {
-                break;
-            }
-
-            System.out.print("value: ");
-            String value = input.next();
-            secondCollectionDocument.append(key, value);
-        }
-
-        System.out.println("Enter the refrence key to use in the second collection ");
-        String refkey = input.next();
-        System.out.println("Enter the key to identify the document in first collection ");
-        String firstFilterKey = input.next();
-
-        System.out.println("Enter the value for that key that identifies the document in the first collection");
-        String firstFilterValue = input.next();
-
-        Document firstFilter = new Document(firstFilterKey, firstFilterValue);
-        Document firstDocument = dbOps.Find(dbName, firstCollection, firstFilter);
-
-        if (firstDocument != null) {
-            dbOps.InsertWithRefrence(dbName, secondCollection, secondCollectionDocument, refkey, firstDocument.get("_id"));
-            System.out.println("Document that has refrence to the first collection is inserted in the second collection  ");
-        } else {
-            System.out.println("An error occurred ");
-        }
-    }
 }
 
 

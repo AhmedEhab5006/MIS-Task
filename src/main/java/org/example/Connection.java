@@ -4,12 +4,15 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoDatabase;
 
 import java.util.Arrays;
 
 public class Connection {
 
-    private MongoClient mongoClient;
+    private static MongoClient mongoClient;
+
+
 
     // Constructor
     public Connection(String host, int port) {
