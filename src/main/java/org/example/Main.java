@@ -13,7 +13,7 @@ public class Main {
                    Menu.createCollectionsAndDocuments();
                    break;
                case 2 :
-                   Menu.DeleteMenu();
+                   Menu.deleteDocuementsFromCollections();
                    break;
                case 3 :
                    Menu.UpdateMenu();

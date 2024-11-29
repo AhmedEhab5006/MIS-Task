@@ -19,7 +19,7 @@ public class Menu {
         System.out.println("---------------Welcome to our DB management system--------------------------------");
         System.out.println("Choose an operation to do :");
         System.out.println("(1) to create customers and orders collections");
-        System.out.println("(2) to delete a document from a collection");
+        System.out.println("(2) to delete a document from the two collections");
         System.out.println("(3) to update a document");
         System.out.println("(-1) to exit");
 
@@ -56,6 +56,16 @@ public class Menu {
         dbOps.Insert(dbName,ordersCollection,new Document("item","headphone").append("price",1000).append("orderID",3));
 
         System.out.println("Customers and Orders collections created successfully");
+
+    }
+
+    public static void deleteDocuementsFromCollections(){
+       String dbName = "techStoreDB";
+       String customersCollection = "customers";
+       String ordersCollection = "orders";
+
+       dbOps.deleteOneDocument(dbName, customersCollection,new Document());
+       dbOps.deleteOneDocument(dbName, ordersCollection,new Document());
 
     }
 

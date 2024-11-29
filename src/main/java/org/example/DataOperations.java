@@ -23,9 +23,18 @@ public class DataOperations {
         database.createCollection(collectionName);
     }
 
+    public void deleteOneDocument(String dbname, String collectionName, Document filter){
+        MongoDatabase database = mongoClient.getDatabase(dbname);
+        MongoCollection<Document> collection = database.getCollection(collectionName);
 
+        Document deletedDoc = collection.findOneAndDelete(filter);
 
-
+        if(deletedDoc != null){
+            System.out.println("Deleted a document from collection "+ collectionName);
+        }else{
+            System.out.println("No docuemnt found to be deleted ");
+        }
+    }
 
 
     public void Insert(String dbName, String collectionName, Document document) {
