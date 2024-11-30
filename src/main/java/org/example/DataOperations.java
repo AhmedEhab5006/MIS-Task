@@ -1,6 +1,8 @@
 package org.example;
 import com.mongodb.client.*;
 import org.bson.Document;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -109,6 +111,17 @@ public class DataOperations {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public List<Document> FindMany(String dbName, String collectionName, Document query){
+        MongoDatabase database = mongoClient.getDatabase(dbName);
+        MongoCollection<Document> collection = database.getCollection(collectionName);
+
+        List<Document> results = new ArrayList<>();
+        for(Document doc : collection.find(query)){
+            results.add(doc);
+        }
+        return results;
     }
 
 

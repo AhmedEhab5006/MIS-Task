@@ -18,6 +18,9 @@ public class Main {
                case 3 :
                    Menu.UpdateMenu();
                    break;
+               case 4 :
+                   Menu.createOneToManyRelationship();
+                   break;
                default:
                    System.out.println("Invalid input!");
                    break;
@@ -26,3 +29,7 @@ public class Main {
        }
     }
 }
+
+
+//for the final point in the task which is to use aggregation to display the one to many
+ //db.orders.aggregate([{$lookup:{from:"customers",localField:"customerID",foreignField:"_id",as:"customer_details"}},{$unwind:"$customer_details"}])

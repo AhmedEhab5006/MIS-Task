@@ -21,6 +21,7 @@ public class Menu {
         System.out.println("(1) to create customers and orders collections");
         System.out.println("(2) to delete a document from the two collections");
         System.out.println("(3) to update a document");
+        System.out.println("(4) for the One to Many relationship");
         System.out.println("(-1) to exit");
 
 
@@ -47,13 +48,16 @@ public class Menu {
         dbOps.CreateCustomersCollection(dbName,customersCollection);
         dbOps.CreateOrdersCollection(dbName,ordersCollection);
 
-        dbOps.Insert(dbName, customersCollection,new Document("name","ali").append("age",20).append("city","cairo"));
-        dbOps.Insert(dbName, customersCollection,new Document("name","ahmed").append("age",19).append("city","giza"));
-        dbOps.Insert(dbName, customersCollection,new Document("name","omar").append("age",21).append("city","alexandria"));
 
-        dbOps.Insert(dbName,ordersCollection,new Document("item","laptop").append("price",65000).append("orderID",1));
-        dbOps.Insert(dbName,ordersCollection,new Document("item","mobile").append("price",40000).append("orderID",2));
-        dbOps.Insert(dbName,ordersCollection,new Document("item","headphone").append("price",1000).append("orderID",3));
+        dbOps.Insert(dbName, customersCollection,new Document("_id",2).append("name","ali").append("age",20).append("city","cairo"));
+        dbOps.Insert(dbName, customersCollection,new Document("_id",3).append("name","ahmed").append("age",19).append("city","giza"));
+        dbOps.Insert(dbName, customersCollection,new Document("_id",1).append("name","omar").append("age",21).append("city","alexandria"));
+
+        dbOps.Insert(dbName,ordersCollection,new Document("_id",101).append("item","laptop").append("price",65000).append("customerID",2));
+        dbOps.Insert(dbName,ordersCollection,new Document("_id",102).append("item","mobile").append("price",40000).append("customerID",1));
+        dbOps.Insert(dbName,ordersCollection,new Document("_id",103).append("item","headphone").append("price",1000).append("customerID",1));
+        dbOps.Insert(dbName,ordersCollection,new Document("_id",104).append("item","charger").append("price",100).append("customerID",3));
+
 
         System.out.println("Customers and Orders collections created successfully");
 
@@ -161,6 +165,39 @@ public class Menu {
 
         } catch (NullPointerException e) {
             System.out.println("There are no matched documents");
+        }
+    }
+
+    public static void createOneToManyRelationship(){
+        String dbName = "techStoreDB";
+        String customersCollection = "customers";
+        String ordersCollection = "orders";
+
+        System.out.println("--viewing the one to many relationships--");
+        viewCustomersOrders(dbName,customersCollection,ordersCollection,1);
+        viewCustomersOrders(dbName,customersCollection,ordersCollection,3);
+    }
+
+    private static void viewCustomersOrders(String dbName, String customersCollection, String ordersCollection,int customerID){
+        //to find the customer by the ID
+        Document customer = dbOps.Find(dbName, customersCollection,new Document("_id",customerID));
+
+        if(customer!= null){
+            System.out.println("\n customer: "+customer.toJson());
+
+            List<Document> customerOrders = dbOps.FindMany(dbName, ordersCollection,new Document("customerID",customerID));
+            //retriving orders from this customer
+
+            if(!customerOrders.isEmpty()){
+                System.out.println("orders for this customer are ");
+                for(Document orders: customerOrders){
+                    System.out.println(orders.toJson());
+                }
+            }else{
+                System.out.println("this customer has no orders");
+            }
+        }else{
+            System.out.println("Customer with _id = "+ customerID + " is ont found" );
         }
     }
 
