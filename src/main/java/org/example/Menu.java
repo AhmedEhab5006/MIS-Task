@@ -73,100 +73,62 @@ public class Menu {
 
     }
 
-    public static void DeleteMenu() {
 
-        int cont = 0;
-        while (cont != -1) {
+    public static void UpdateMenu() {
 
-            System.out.println("Enter desired database :");
-            String dbName = input.next();
-            System.out.println("Enter desired collection name :");
-            String collectionName = input.next();
-            System.out.println("Enter DOC filter key :");
-            String filterKey = input.next();
-            System.out.println("Enter DOC filter value :");
-            String filterValue = input.next();
+        List<Double> scoreList = Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
-            Document filter = new Document(filterKey, filterValue);
+        int id = 1;
+        for (int i = 0 ; i < 2 ; i++){
 
-
-            Document found = dbOps.Find(dbName, collectionName, filter);
+            Document filter = new Document("_id", id);
+            Document found = dbOps.Find("techStoreDB", "customers", filter);
+            List<Document> doc = new ArrayList<>() ;
 
 
             try {
+                //making sure that document exists
                 found.get("_id");
-                dbOps.Delete(dbName, collectionName, (filter));
+
+
+                //Initializing our score array to 0
+                Document update = new Document("$set", new Document("Score", scoreList));
+                doc.add(update);
+                dbOps.Update("techStoreDB", "customers", filter, doc);
+                System.out.println("Score Array added!");
+                doc.remove(update);
+
+
+                //Adding numbers
+                doc.add(dbOps.AddNumbersToIndex().get(1));
+                dbOps.Update("techStoreDB", "customers" , filter , doc);
+                System.out.println("Number added!");
+
+
+                //resetting doc list
+                doc.clear();
+
+
+                //multiplying numbers
+                doc.add(dbOps.MultiplyBy20().get(1));
+                dbOps.Update("techStoreDB", "customers" , filter , doc);
+
+
+                System.out.println("Numbers multiplied!");
+
+
+
             } catch (NullPointerException e) {
                 System.out.println("There are no matched documents");
             }
 
-            System.out.println("Do you want to do another delete operation ?? (1) for YES (-1) for no");
-
-            try {
-                cont = input.nextInt();
-            } catch (InputMismatchException e) {
-                System.out.println("Please enter an integer number");
-                cont = -1;
-            }
-
+            id += 2 ;
 
         }
+
     }
 
-    public static void UpdateMenu() {
 
-        System.out.println("Enter desired database :");
-        String dbName = input.next();
-        System.out.println("Enter desired collection name :");
-        String collectionName = input.next();
-        System.out.println("Enter DOC filter key");
-        String filterKey = input.next();
-        System.out.println("Enter DOC filter value");
-        String filterValue = input.next();
-
-
-        List<Double> scoreList = Arrays.asList(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-        Document filter = new Document(filterKey, filterValue);
-        Document found = dbOps.Find(dbName, collectionName, filter);
-        List<Document> doc = new ArrayList<>() ;
-
-
-        try {
-            //making sure that document exists
-            found.get("_id");
-
-
-            //Initializing our score array to 0
-            Document update = new Document("$set", new Document("Score", scoreList));
-            doc.add(update);
-            dbOps.Update(dbName, collectionName, filter, doc);
-            System.out.println("Score Array added!");
-            doc.remove(update);
-
-
-            //Adding numbers
-            doc.add(dbOps.AddNumbersToIndex().get(1));
-            dbOps.Update(dbName , collectionName , filter , doc);
-            System.out.println("Number added!");
-
-
-            //resetting doc list
-            doc.clear();
-
-
-            //multiplying numbers
-            doc.add(dbOps.MultiplyBy20().get(1));
-            dbOps.Update(dbName , collectionName , filter , doc);
-
-
-            System.out.println("Numbers multiplied!");
-
-
-
-        } catch (NullPointerException e) {
-            System.out.println("There are no matched documents");
-        }
-    }
 
     public static void createOneToManyRelationship(){
         String dbName = "techStoreDB";

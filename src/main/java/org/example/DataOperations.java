@@ -54,12 +54,12 @@ public class DataOperations {
                         new Document("$arrayElemAt", Arrays.asList("$Score", 0)),
                         new Document("$arrayElemAt", Arrays.asList("$Score", 1)),
                         new Document("$cond", Arrays.asList(
-                                new Document("$eq", Arrays.asList("$_id", "1")),
+                                new Document("$eq", Arrays.asList("$_id", 1)),
                                 5.0,
                                 new Document("$arrayElemAt", Arrays.asList("$Score", 2))
                         )),
                         new Document("$cond", Arrays.asList(
-                                new Document("$ne", Arrays.asList("$_id", "1")),
+                                new Document("$ne", Arrays.asList("$_id", 1)),
                                 6.0,
                                 new Document("$arrayElemAt", Arrays.asList("$Score", 3))
                         )),
@@ -88,17 +88,11 @@ public class DataOperations {
     }
 
 
-    public void Delete(String dbName, String collectionName, Document filter) {
-        MongoDatabase database = mongoClient.getDatabase(dbName);
-        MongoCollection<Document> collection = database.getCollection(collectionName);
-        collection.deleteMany(filter);
-        System.out.println("Document deleted from collection: " + collectionName);
-    }
-
     public void deleteCollection(String dbName, String collectionName){
         MongoDatabase database = mongoClient.getDatabase(dbName);
         database.getCollection(collectionName).drop();
     }
+
 
     public Document Find(String dbName, String collectionName, Document filter) {
         try {
@@ -112,6 +106,7 @@ public class DataOperations {
             return null;
         }
     }
+
 
     public List<Document> FindMany(String dbName, String collectionName, Document query){
         MongoDatabase database = mongoClient.getDatabase(dbName);
