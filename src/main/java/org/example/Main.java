@@ -33,3 +33,4 @@ public class Main {
 
 //for the final point in the task which is to use aggregation to display the one to many
  //db.orders.aggregate([{$lookup:{from:"customers",localField:"customerID",foreignField:"_id",as:"customer_details"}},{$unwind:"$customer_details"}])
+//db.customers.aggregate([{$lookup:{from:"orders",localField:"_id",foreignField:"customerID",as:"order_details"}}])

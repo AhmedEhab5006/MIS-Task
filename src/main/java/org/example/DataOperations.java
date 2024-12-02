@@ -119,6 +119,30 @@ public class DataOperations {
         return results;
     }
 
+   public void deleteCustomerAndOrders(String dbName, String customerCollection,String ordersCollection,String customerName){
+        MongoDatabase database = mongoClient.getDatabase(dbName);
+        MongoCollection<Document> customers = database.getCollection(customerCollection);
+        MongoCollection<Document> orders = database.getCollection(ordersCollection);
+
+        Document filter = new Document("name",customerName);
+
+        Document deletedCustomer = customers.findOneAndDelete(filter);
+
+        try {
+            if(deletedCustomer != null){
+                orders.deleteMany(new Document("customerID",deletedCustomer.get("_id")));
+                System.out.println("the customer and his orders are deleted succesfully");
+
+            }else{
+                System.out.println("No customer was found that has the name "+ customerName);
+            }
+        }catch (Exception e){
+            System.out.println("deletion happened");
+        }
+
+        }
+
+
 
     }
 
